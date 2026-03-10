@@ -57,7 +57,7 @@ async function main() {
 
     const longTerm = new LongTermMemory(ws.wp("memory", "MEMORY.md"));
     const shortTerm = new ShortTermMemory(10);
-    const ai = new NvidiaEngine({ apiKey: "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", toolsManager }, logger);
+    const ai = new NvidiaEngine({ apiKey: "nvapi-key", toolsManager }, logger);
     const ai2 = new MockEngine(logger);
 
     const agent = new Agent(longTerm, shortTerm, ai, toolsManager, logger);
