@@ -9,7 +9,7 @@ export class MockEngine extends AIEngine {
 
     async decide(shortTerm: object, longTerm: string, input: string, inputSys: string): Promise<Action> {
         input = input.toLowerCase().trim();
-        await this.logger.sys(shortTerm)
+        await this.logger.info(shortTerm)
 
         if (input.includes("use test")) {
             return {
