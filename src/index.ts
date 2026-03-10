@@ -10,6 +10,8 @@ import path from "path";
 import fsPromises from "fs/promises";
 import yargs, { help } from 'yargs';
 
+import dotenv from 'dotenv';
+dotenv.config();
 
 async function main() {
     const argv = yargs(process.argv.slice(2))
@@ -57,7 +59,7 @@ async function main() {
 
     const longTerm = new LongTermMemory(ws.wp("memory", "MEMORY.md"));
     const shortTerm = new ShortTermMemory(10);
-    const ai = new NvidiaEngine({ apiKey: "nvapi-key", toolsManager }, logger);
+    const ai = new NvidiaEngine({ apiKey: process.env.NVIDIA_API_KEY!, toolsManager }, logger);
     const ai2 = new MockEngine(logger);
 
     const agent = new Agent(longTerm, shortTerm, ai, toolsManager, logger);
