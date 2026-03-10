@@ -81,6 +81,21 @@ Documentation PRs are always welcome — no issue needed for small fixes like ty
 - Make sure your code runs without errors before submitting.
 - Be responsive to review feedback — maintainers may request changes.
 
+## 📝 Pull Request Title Format
+
+PR titles must follow the same format as commit messages since we use **squash merging** — the PR title becomes the commit on `main`.
+
+📄 **Full specification:** [commit_format.md](https://github.com/vividorg/agent/blob/main/commit_format.md)
+
+**Quick examples:**
+```
+feat: add summarize tool
+fix: resolve workspace crash on startup
+docs: update getting started guide
+```
+
+> Your PR title is what lands on `main` — make it clean and descriptive.
+
 ---
 
 ## 💬 Commit Message Format
