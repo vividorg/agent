@@ -10,7 +10,36 @@ jobs:
         with:
           fetch-depth: 0
       - uses: super-linter/super-linter@v8.3.1
+        id: lint
+        continue-on-error: true
         env:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_TYPESCRIPT_PRETTIER: true
+          VALIDATE_JAVASCRIPT_ES: true
+          VALIDATE_JAVASCRIPT_PRETTIER: true
+          VALIDATE_JSON: true
+          VALIDATE_YAML: true
+          VALIDATE_MARKDOWN: true
           VALIDATE_TYPESCRIPT_ES: false
+          SAVE_SUPER_LINTER_SUMMARY: true
+          SAVE_SUPER_LINTER_OUTPUT: true
+
+      - name: Post detailed lint errors to summary
+        if: always()
+        run: |
+          echo "## 🔍 Lint Details" >> $GITHUB_STEP_SUMMARY
+          for file in /github/workspace/super-linter-reports/**/*.log; do
+            if [ -s "$file" ]; then
+              name=$(basename "$file" .log)
+              echo "### $name" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              cat "$file" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+      - name: Fail if lint failed
+        if: steps.lint.outcome == 'failure'
+        run: exit 1
