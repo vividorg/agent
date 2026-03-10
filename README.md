@@ -1,6 +1,6 @@
 # Vivid Agent
 
-[![Discord](https://img.shields.io/discord/1234567890?label=Discord&logo=discord)](https://discord.gg/HtqrZuNhs6)
+[![Discord](https://img.shields.io/discord/1480982120942928056?label=Discord&logo=discord)](https://discord.gg/HtqrZuNhs6)
 [![GitHub issues](https://img.shields.io/github/issues/vividorg/agent)](https://github.com/vividorg/agent/issues)
 [![License](https://img.shields.io/github/license/vividorg/agent)](LICENSE)
 
