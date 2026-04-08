@@ -93,7 +93,7 @@ docker compose up -d --build
 vivid tui -m "Hi there, what can you do?"
 ```
 
-The Docker setup persists agent data in volume `vivid_data` (`VIVID_HOME=/data` in container).
+The Docker setup persists agent data in the local `./data/` folder (`VIVID_HOME=/data` in container).
 
 ## ⚙️ Run as Service with PM2
 ```bash
