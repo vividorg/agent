@@ -3,10 +3,20 @@
   "version": "0.0.1",
   "description": "",
   "main": "src/index.ts",
+  "bin": {
+    "vivid": "dist/index.js"
+  },
   "scripts": {
     "dev": "tsx src/index.ts",
-    "build": "tsc",
-    "prod": "node dist/index.js"
+    "build": "tsc && node scripts/copy-assets.mjs",
+    "start": "node dist/index.js",
+    "prod": "node dist/index.js",
+    "service": "node dist/index.js service",
+    "service:dev": "tsx src/index.ts service",
+    "tui": "node dist/index.js tui",
+    "tui:dev": "tsx src/index.ts tui",
+    "pm2:start": "pm2 start ecosystem.config.cjs",
+    "pm2:stop": "pm2 stop vivid-service && pm2 delete vivid-service"
   },
   "keywords": [],
   "author": "",
