@@ -23,7 +23,7 @@ We aim to build a **reliable, self‑hosted agent** that can:
 
 ## 🤝 Join the Community
 Development happens in the open, and we’d love your help!  
-- **Chat with us on [Discord](https://discord.gg/invite) \(preparing\)** – real‑time discussions, support, and ideas.  
+- **Chat with us on [Discord](https://discord.gg/invite)** – real‑time discussions, support, and ideas.  
 - **Report issues** or suggest features via [GitHub Issues](https://github.com/vividorg/agent/issues).  
 - **Contribute** – check the [contributing guide](CONTRIBUTING.md) and look for [good first issues](https://github.com/vividorg/agent/labels/good%20first%20issue).
 
