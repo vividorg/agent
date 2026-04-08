@@ -81,7 +81,7 @@ export LLAMA_MAX_TOKENS=4096
 3. Run service and send prompt:
 ```bash
 npm run service
-npm run tui -- -m "Ahoj z llama.cpp"
+npm run tui -- -m "Hi there, what can you do?"
 ```
 
 ## 🐳 Run in Docker
