@@ -76,7 +76,7 @@ export LLAMA_BASE_URL=http://127.0.0.1:8080
 export LLAMA_MODEL=local
 export LLAMA_MAX_TOKENS=4096
 ```
-*(Alternatively, copy `.env.example` into `.env` and set these values accordingly.)*
+> 💡 **Tip:** We recommend copying `.env.example` to `.env` and configuring these values there instead of exporting them manually.
 
 3. Run service and send prompt:
 ```bash
@@ -106,5 +106,14 @@ pm2 status
 # stop service
 npm run pm2:stop
 ```
+
+Alternatively, if you prefer to use `pm2` directly, you can use the provided `ecosystem.config.cjs` as a starting point:
+```bash
+pm2 start ecosystem.config.cjs
+pm2 stop vivid-agent
+pm2 logs vivid-agent
+```
+
+For other PM2 commands, refer to [PM2 documentation](https://pm2.keymetrics.io/docs/usage/quick-start/)
 
 You can customize storage path with `VIVID_HOME` (default: `./.vivid` in current working directory).
