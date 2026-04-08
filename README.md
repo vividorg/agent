@@ -32,5 +32,79 @@ Development happens in the open, and we’d love your help!
 git clone https://github.com/vividorg/agent.git
 cd agent
 npm install
-npm run dev
+npm run build
+npm run service
 ```
+
+In another terminal:
+
+```bash
+# one-shot prompt
+npm run tui -- -m "Hello from CLI"
+
+# interactive prompt window (/exit to quit)
+npm run tui
+```
+
+## 🧩 CLI Commands
+
+To make the `vivid` command available globally anywhere in your terminal, grant execution rights to the built script and link the package:
+```bash
+chmod +x dist/index.js
+npm link
+```
+
+After doing this, you can run the following commands:
+- `vivid service` – runs HTTP service for incoming prompts (`POST /prompt`).
+- `vivid tui` – opens an interactive CLI prompt window.
+- `vivid tui -m "prompt"` – sends one prompt and exits.
+- `--mock` – starts service with mock AI engine.
+- `--engine nvidia|llama|mock` – choose AI provider.
+
+Default service URL is `http://127.0.0.1:3000`, configurable using `--url` or `VIVID_SERVICE_URL`.
+
+## 🦙 Local AI via llama.cpp
+1. Start `llama.cpp` server with OpenAI-compatible endpoint:
+```bash
+./llama-server -m /path/to/model.gguf --host 0.0.0.0 --port 8080
+```
+2. Configure Vivid:
+```bash
+export NVIDIA_API_KEY=nvapi-key
+export AI_ENGINE=llama
+export LLAMA_BASE_URL=http://127.0.0.1:8080
+export LLAMA_MODEL=local
+export LLAMA_MAX_TOKENS=4096
+```
+*(Alternatively, copy `.env.example` into `.env` and set these values accordingly.)*
+
+3. Run service and send prompt:
+```bash
+npm run service
+npm run tui -- -m "Ahoj z llama.cpp"
+```
+
+## 🐳 Run in Docker
+```bash
+# build and run service
+docker compose up -d --build
+
+# send prompt to the containerized service
+vivid tui -m "Hi there, what can you do?"
+```
+
+The Docker setup persists agent data in volume `vivid_data` (`VIVID_HOME=/data` in container).
+
+## ⚙️ Run as Service with PM2
+```bash
+npm run build
+npm run pm2:start
+
+# check status
+pm2 status
+
+# stop service
+npm run pm2:stop
+```
+
+You can customize storage path with `VIVID_HOME` (default: `./.vivid` in current working directory).
