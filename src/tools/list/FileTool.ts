@@ -35,7 +35,7 @@ export default class FileTool implements Tool {
                         return 'Error: "content" parameter is required for writing.';
                     }
 
-                    await fsPromises.mkdir(safePath, { recursive: true });
+                    await fsPromises.mkdir(path.dirname(safePath), { recursive: true });
                     await fsPromises.writeFile(safePath, contentParam, 'utf-8');
                     return `File ${filePath} was successfully written.`;
                 }
