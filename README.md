@@ -61,7 +61,7 @@ After doing this, you can run the following commands:
 - `--mock` – starts service with mock AI engine.
 - `--engine nvidia|llama|mock` – choose AI provider.
 
-Default service URL is `http://127.0.0.1:3000`, configurable using `--url` or `VIVID_SERVICE_URL`.
+Default service URL is `http://127.0.0.1:3100`, configurable using `--url` or `VIVID_SERVICE_URL`.
 
 ## 🦙 Local AI via llama.cpp
 1. Start `llama.cpp` server with OpenAI-compatible endpoint:

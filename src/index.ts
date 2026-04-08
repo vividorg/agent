@@ -27,7 +27,7 @@ async function main() {
             (cmd) =>
                 cmd.option("port", {
                     type: "number",
-                    default: Number(process.env.PORT || 3000),
+                    default: Number(process.env.PORT || 3100),
                     describe: "Service port",
                 }),
             async (argv) => {
@@ -47,7 +47,7 @@ async function main() {
                     })
                     .option("url", {
                         type: "string",
-                        default: process.env.VIVID_SERVICE_URL || "http://127.0.0.1:3000",
+                        default: process.env.VIVID_SERVICE_URL || "http://127.0.0.1:3100",
                         describe: "Vivid service URL",
                     }),
             async (argv) => {
