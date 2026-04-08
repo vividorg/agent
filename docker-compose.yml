@@ -1,0 +1,13 @@
+services:
+  vivid:
+    build: .
+    container_name: vivid-agent
+    ports:
+      - "3000:3000"
+    environment:
+      NVIDIA_API_KEY: ${NVIDIA_API_KEY}
+      VIVID_HOME: /data
+      PORT: 3000
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
