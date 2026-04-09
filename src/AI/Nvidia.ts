@@ -135,7 +135,7 @@ export class NvidiaEngine extends AIEngine {
             }
         } catch (err) {
             await this.logger.error("Failed to parse AI output as JSON:", err, "Raw:", rawContent);
-            action = { type: "text", content: rawContent || "" };
+            throw new Error(`AI returned invalid JSON: ${(err as Error).message}`);
         }
 
         await this.logger.res("AI Decision", action);
