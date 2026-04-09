@@ -49,7 +49,7 @@ export async function runTui(message: string | undefined, serviceUrl: string, ve
     };
 
     const promptText = chalk.hex("FFA500")("vivid › ");
-    const responsePrefix = chalk.green("response");
+    const responsePrefix = chalk.green("response › ");
 
     if (message && message.trim()) {
         try {
