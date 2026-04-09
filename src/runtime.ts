@@ -15,13 +15,13 @@ export type AgentRuntime = {
 
 export type EngineName = "nvidia" | "llama" | "mock";
 
-export async function createRuntime(engineName: EngineName): Promise<AgentRuntime> {
+export async function createRuntime(engineName: EngineName, verbosity: number = 0): Promise<AgentRuntime> {
     const vividHome = process.env.VIVID_HOME || path.join(process.cwd(), ".vivid");
     const workspacePath = path.join(vividHome, "workspace");
     const agentPath = vividHome;
 
     const ws = new Workspace(workspacePath);
-    await ws.init();
+    await ws.init(verbosity);
     const logger = ws.getLogger();
     await logger.info("Agent starting...");
 

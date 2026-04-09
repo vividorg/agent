@@ -15,8 +15,8 @@ function writeJson(res: ServerResponse, statusCode: number, body: unknown): void
     res.end(JSON.stringify(body));
 }
 
-export async function runService(port: number, engineName: EngineName): Promise<void> {
-    const runtime = await createRuntime(engineName);
+export async function runService(port: number, engineName: EngineName, verbosity: number = 0): Promise<void> {
+    const runtime = await createRuntime(engineName, verbosity);
 
     const server = createServer(async (req, res) => {
         try {

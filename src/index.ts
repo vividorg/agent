@@ -21,6 +21,11 @@ async function main() {
             default: (process.env.AI_ENGINE as EngineName) || "nvidia",
             describe: "AI engine to use",
         })
+        .option("verbose", {
+            alias: "v",
+            type: "count",
+            describe: "Increase verbosity (up to -vv)",
+        })
         .command(
             "service",
             "Run vivid as an HTTP service",
@@ -32,7 +37,7 @@ async function main() {
                 }),
             async (argv) => {
                 const engineName = (argv.mock ? "mock" : argv.engine) as EngineName;
-                await runService(argv.port as number, engineName);
+                await runService(argv.port as number, engineName, argv.verbose as number);
             }
         )
         .command(
@@ -51,17 +56,22 @@ async function main() {
                         describe: "Vivid service URL",
                     }),
             async (argv) => {
-                await runTui(argv.message as string | undefined, argv.url as string);
+                await runTui(argv.message as string | undefined, argv.url as string, argv.verbose as number);
             }
         )
         .demandCommand(1)
         .strict()
-        .help();
+        .help()
+        .showHelpOnFail(false);
 
     await cli.parseAsync();
 }
 
 main().catch((error) => {
-    console.error(error);
+    if (error instanceof Error) {
+        console.error(error.message);
+    } else {
+        console.error(error);
+    }
     process.exitCode = 1;
 });

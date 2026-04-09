@@ -13,15 +13,15 @@ export enum LogLevel {
 
 export class Logger {
     private logFilePath?: string;
-    private enableConsole: boolean;
+    private verbosityLevel: number;
 
     /**
     * @param logFilePath – if specified, logs are also saved to this file
-    * @param enableConsole – whether to log to the console (default true)
+    * @param verbosityLevel – console verbosity level (0: Info/Warn/Error/RESPONSE, 1: Data, 2: Debug)
     */
-    constructor(logFilePath?: string, enableConsole: boolean = true) {
+    constructor(logFilePath?: string, verbosityLevel: number = 0) {
         this.logFilePath = logFilePath;
-        this.enableConsole = enableConsole;
+        this.verbosityLevel = verbosityLevel;
     }
 
     private async writeToFile(level: LogLevel, message: any, ...args: any[]): Promise<void> {
@@ -51,31 +51,37 @@ export class Logger {
     }
 
     private consoleLog(level: LogLevel, message: string, ...args: any[]): void {
-        if (!this.enableConsole) return;
-
         const timestamp = new Date().toLocaleTimeString();
         const prefix = `[${timestamp}] [${level}]`;
         const messageStr = typeof message === 'string' ? message : JSON.stringify(message);
 
-        switch (level) {
-            case LogLevel.DEBUG:
-                console.log(this.getLevelStyle(level)(prefix), this.getLevelStyle(level)(messageStr), ...args);
-                break;
-            case LogLevel.INFO:
-                console.warn(this.getLevelStyle(level)(prefix), messageStr, ...args);
-                break;
-            case LogLevel.DATA:
-                console.error(this.getLevelStyle(level)(prefix), messageStr, ...args);
-                break;
-            case LogLevel.RESPONSE:
-                console.error(this.getLevelStyle(level)(prefix), messageStr, ...args);
-                break;
-            case LogLevel.WARN:
-                console.error(this.getLevelStyle(level)(prefix), this.getLevelStyle(level)(messageStr), ...args);
-                break;
-            case LogLevel.ERROR:
-                console.error(this.getLevelStyle(level)(prefix), this.getLevelStyle(level)(messageStr), ...args);
-                break;
+        const print = () => {
+            switch (level) {
+                case LogLevel.DEBUG:
+                    console.log(this.getLevelStyle(level)(prefix), this.getLevelStyle(level)(messageStr), ...args);
+                    break;
+                case LogLevel.INFO:
+                    console.warn(this.getLevelStyle(level)(prefix), messageStr, ...args);
+                    break;
+                default:
+                    console.error(this.getLevelStyle(level)(prefix), messageStr, ...args);
+                    break;
+            }
+        };
+
+        if (level === LogLevel.ERROR || level === LogLevel.WARN || level === LogLevel.INFO || level === LogLevel.RESPONSE) {
+            print();
+            return;
+        }
+
+        if (this.verbosityLevel >= 1 && level === LogLevel.DATA) {
+            print();
+            return;
+        }
+
+        if (this.verbosityLevel >= 2 && level === LogLevel.DEBUG) {
+            print();
+            return;
         }
     }
 

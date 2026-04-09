@@ -53,13 +53,13 @@ export class Workspace {
         }
     }
 
-    async init() {
+    async init(verbosity: number = 0) {
         const logdir = path.join(this.wpDir, "../logs");
         const logFile = path.join(logdir, "app.log");
 
         await fsPromises.mkdir(logdir, { recursive: true })
 
-        this.logger = new Logger(logFile, true);
+        this.logger = new Logger(logFile, verbosity);
         await this.logger.info('Workspace initialized');
 
         await Promise.all(
