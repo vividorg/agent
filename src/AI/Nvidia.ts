@@ -99,7 +99,7 @@ export class NvidiaEngine extends AIEngine {
             headers: {
                 "Authorization": `Bearer ${this.apiKey}`,
                 "Content-Type": "application/json",
-                "Accept": "text/event-stream",
+                "Accept": "application/json",
             },
             body: JSON.stringify({
                 model: this.model,
@@ -111,13 +111,51 @@ export class NvidiaEngine extends AIEngine {
             }),
         });
 
+        if (!res.ok) {
+            const errText = await res.text();
+            throw new Error(`API returned ${res.status}: ${errText}`);
+        }
+
         const raw = await res.json();
         const data = raw as {
             choices?: { message?: { content?: string } }[];
         };
 
         let rawContent = data.choices?.[0]?.message?.content ?? "";
-        rawContent = rawContent.replace(/^\s*```json\s*|\s*```\s*$/g, "").trim();
+        
+        // Robust balanced JSON extraction
+        const extractFirstJson = (str: string) => {
+            const start = str.indexOf('{');
+            if (start === -1) return str;
+            let depth = 0;
+            let insideString = false;
+            let escaped = false;
+            for (let i = start; i < str.length; i++) {
+                const char = str[i];
+                if (escaped) {
+                    escaped = false;
+                    continue;
+                }
+                if (char === '\\') {
+                    escaped = true;
+                    continue;
+                }
+                if (char === '"') {
+                    insideString = !insideString;
+                    continue;
+                }
+                if (!insideString) {
+                    if (char === '{') depth++;
+                    else if (char === '}') {
+                        depth--;
+                        if (depth === 0) return str.substring(start, i + 1);
+                    }
+                }
+            }
+            return str.substring(start);
+        };
+
+        rawContent = extractFirstJson(rawContent).trim();
 
         await this.logger.data("--------------------------")
         await this.logger.data("FULL DATA:", JSON.stringify(raw, null, 2));
@@ -126,12 +164,11 @@ export class NvidiaEngine extends AIEngine {
         let action: Action;
         try {
             if (!rawContent || rawContent.trim() === "") {
-                action = { type: "text", content: "" };
-            } else {
-                action = JSON.parse(rawContent);
-                if (!action.type || !("content" in action)) {
-                    throw new Error("Missing type/content fields");
-                }
+                throw new Error("AI returned empty content");
+            }
+            action = JSON.parse(rawContent);
+            if (!action.type || !("content" in action)) {
+                throw new Error("Missing type/content fields");
             }
         } catch (err) {
             await this.logger.error("Failed to parse AI output as JSON:", err, "Raw:", rawContent);

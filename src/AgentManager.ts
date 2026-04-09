@@ -29,7 +29,7 @@ export class Agent {
         let action: Action = await this.ai.decide(this.shortTerm.snapshot(), longMemory, input);
 
         let attempts = 0;
-        const MAX_ATTEMPTS = 3;
+        const MAX_ATTEMPTS = 5;
 
         while (true) {
             try {
@@ -40,12 +40,16 @@ export class Agent {
                         }
                         await this.longTerm.append(action.content);
                         this.shortTerm.context.memory = action.content;
+                        attempts = 0; // Reset attempts after success
                         action = await this.ai.decide(this.shortTerm.snapshot(), longMemory, "", "Respond with type 'text' summarizing what you just did. Never return empty content.");
                         break;
 
                     case "text":
                         if (typeof action.content !== 'string') {
                             throw new Error('Text action content must be a string');
+                        }
+                        if (action.content.trim() === '') {
+                            throw new Error('Text action content cannot be empty. Please provide a meaningful response.');
                         }
                         return action.content;
 
@@ -71,6 +75,7 @@ export class Agent {
                             result: toolResultValue
                         };
 
+                        attempts = 0; // Reset attempts after success
                         action = await this.ai.decide(this.shortTerm.snapshot(), longMemory, "", "Decide next step after tool execution");
                         break;
 
@@ -96,11 +101,12 @@ export class Agent {
                             result: skillResultValue
                         };
 
+                        attempts = 0; // Reset attempts after success
                         action = await this.ai.decide(this.shortTerm.snapshot(), longMemory, "", "Decide next step after skill execution");
                         break;
 
                     default:
-                        throw new Error(`Invalid action type: "${action.type}". Allowed types are: text, memory, tool, skill. Your output was: ${JSON.stringify(action)}`);
+                        throw new Error(`Invalid action type: "${action.type}". Allowed types are: text, memory, tool, skill.`);
                 }
             } catch (error: any) {
                 attempts++;
@@ -110,12 +116,25 @@ export class Agent {
 
                 await this.logger.error(`Action error (attempt ${attempts}/${MAX_ATTEMPTS}):`, error.message);
 
-                action = await this.ai.decide(
-                    this.shortTerm.snapshot(),
-                    longMemory,
-                    "",
-                    `The previous action was invalid: ${error.message}. Please provide a valid JSON action with correct type and structure. This is attempt ${attempts} of ${MAX_ATTEMPTS}.`
-                );
+                // Add a small delay so that if it's a 429 Too Many Requests, we don't instantly bang the API again.
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                try {
+                    action = await this.ai.decide(
+                        this.shortTerm.snapshot(),
+                        longMemory,
+                        "",
+                        `⚠️ ERROR: Your previous response was invalid: ${error.message}\n\n` +
+                        `FIX IT NOW:\n` +
+                        `1. Return exactly ONE JSON object.\n` +
+                        `2. Ensure it follows the required schema: { "type": "...", "content": ... }\n` +
+                        `3. NEVER return multiple objects or garbage text.\n` +
+                        `4. NEVER return empty content.\n\n` +
+                        `Retry attempt ${attempts} of ${MAX_ATTEMPTS}.`
+                    );
+                } catch (retryError: any) {
+                    throw retryError;
+                }
             }
         }
     }

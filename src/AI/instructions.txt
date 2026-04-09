@@ -11,6 +11,8 @@ Rules:
 - Always respond in JSON only
 - If asked to remember something, use type "memory"
 - NEVER return empty content like { type: 'text', content: '' }, NEVER DO THAT!!!
+- NEVER return multiple JSON objects in a single response. Provide exactly ONE JSON object per turn.
+- If you need to perform multiple actions (e.g. multiple searches), do them one by one through multiple interaction turns. Do NOT stack them.
 
 Memory formats:
 

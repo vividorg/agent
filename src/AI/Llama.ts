@@ -127,7 +127,40 @@ export class LlamaEngine extends AIEngine {
         };
 
         let rawContent = data.choices?.[0]?.message?.content ?? "";
-        rawContent = rawContent.replace(/^\s*```json\s*|\s*```\s*$/g, "").trim();
+        
+        // Robust balanced JSON extraction
+        const extractFirstJson = (str: string) => {
+            const start = str.indexOf('{');
+            if (start === -1) return str;
+            let depth = 0;
+            let insideString = false;
+            let escaped = false;
+            for (let i = start; i < str.length; i++) {
+                const char = str[i];
+                if (escaped) {
+                    escaped = false;
+                    continue;
+                }
+                if (char === '\\') {
+                    escaped = true;
+                    continue;
+                }
+                if (char === '"') {
+                    insideString = !insideString;
+                    continue;
+                }
+                if (!insideString) {
+                    if (char === '{') depth++;
+                    else if (char === '}') {
+                        depth--;
+                        if (depth === 0) return str.substring(start, i + 1);
+                    }
+                }
+            }
+            return str.substring(start);
+        };
+
+        rawContent = extractFirstJson(rawContent).trim();
 
         await this.logger.data("--------------------------")
         await this.logger.data("FULL DATA:", JSON.stringify(raw, null, 2));
