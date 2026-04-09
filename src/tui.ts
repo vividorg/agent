@@ -54,7 +54,7 @@ export async function runTui(message: string | undefined, serviceUrl: string, ve
     if (message && message.trim()) {
         try {
             const response = await handlePrompt(message);
-            console.log(`\n${responsePrefix}${render(response).trimEnd()}`);
+            console.log(`\n${responsePrefix}${render(response).trimEnd()}\n`);
         } catch (err: any) {
             console.error(chalk.red(err.message));
         }
