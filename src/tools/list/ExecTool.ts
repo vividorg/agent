@@ -15,31 +15,35 @@ export default class FileTool implements Tool {
         }
     ];
 
-    private blockList: string[] = [
-        ":(){ :|:& };:",
-        "shutdown",
-        "reboot",
-        "poweroff",
-        "/dev/sd",
-        "dd if=",
-        "format",
-        "mkfs",
-        "diskpart",
-        "rm -rf",
-        "del /f",
-        "rmdir /s"
-    ]
+    private blockList: { pattern: string, suggestion?: string }[] = [
+        { pattern: ":(){ :|:& };:" },
+        { pattern: "shutdown" },
+        { pattern: "reboot" },
+        { pattern: "poweroff" },
+        { pattern: "/dev/sd" },
+        { pattern: "dd if=", suggestion: "Use 'fallocate -l' or 'truncate -s' to create predictably sized files instead." },
+        { pattern: "format" },
+        { pattern: "mkfs" },
+        { pattern: "diskpart" },
+        { pattern: "rm -rf", suggestion: "Consider using the FileTool's delete operation for safe file/folder removal." },
+        { pattern: "del /f" },
+        { pattern: "rmdir /s" }
+    ];
 
-    private isBlocked(command: string): boolean {
-        command = command.toLowerCase();
+    private getBlockReason(command: string): string | null {
+        const lowerCmd = command.toLowerCase();
 
-        for (const cmd of this.blockList) {
-            if (command.includes(cmd.toLowerCase())) {
-                return true;
+        for (const block of this.blockList) {
+            if (lowerCmd.includes(block.pattern.toLowerCase())) {
+                let msg = `The command is blocked for security reasons (matched pattern: '${block.pattern}').`;
+                if (block.suggestion) {
+                    msg += `\nSuggestion: ${block.suggestion}`;
+                }
+                return msg;
             }
         }
 
-        return false;
+        return null;
     }
 
     public async execute(operation: any, params: any, rootPath: string): Promise<any> {
@@ -52,7 +56,8 @@ export default class FileTool implements Tool {
             return 'Error: parameter "command" must be a string.';
         }
 
-        if (this.isBlocked(command)) return `The command ${command} is blocked for security reasons.`;
+        const blockReason = this.getBlockReason(command);
+        if (blockReason) return blockReason;
 
         try {
             const { stdout, stderr } = await execPromise(command, { timeout: 30000 });
