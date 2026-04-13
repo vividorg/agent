@@ -21,99 +21,97 @@ We aim to build a **reliable, self‑hosted agent** that can:
 - Learn from interactions via long‑term memory.
 - Be extended with custom tools and skills by the community.
 
-## 🤝 Join the Community
-Development happens in the open, and we’d love your help!  
-- **Chat with us on [Discord](https://discord.gg/invite)** – real‑time discussions, support, and ideas.  
-- **Report issues** or suggest features via [GitHub Issues](https://github.com/vividorg/agent/issues).  
-- **Contribute** – check the [contributing guide](CONTRIBUTING.md) and look for [good first issues](https://github.com/vividorg/agent/labels/good%20first%20issue).
-
 ## 🚦 Quick Start
+
 ```bash
 git clone https://github.com/vividorg/agent.git
 cd agent
 npm install
 npm run build
-npm run service
-```
-
-In another terminal:
-
-```bash
-# one-shot prompt
-npm run tui -- -m "Hello from CLI"
-
-# interactive prompt window (/exit to quit)
-npm run tui
-```
-
-## 🧩 CLI Commands
-
-To make the `vivid` command available globally anywhere in your terminal, grant execution rights to the built script and link the package:
-```bash
 chmod +x dist/index.js
 npm link
 ```
 
-After doing this, you can run the following commands:
-- `vivid service` – runs HTTP service for incoming prompts (`POST /prompt`).
-- `vivid tui` – opens an interactive CLI prompt window.
-- `vivid tui -m "prompt"` – sends one prompt and exits.
-- `--mock` – starts service with mock AI engine.
-- `--engine nvidia|llama|mock` – choose AI provider.
+Start the service and open an interactive session:
 
-Default service URL is `http://127.0.0.1:3100`, configurable using `--url` or `VIVID_SERVICE_URL`.
+```bash
+vivid service         # start the agent service
+vivid tui             # open interactive prompt (/exit to quit)
+```
+
+Or send a one-shot prompt:
+
+```bash
+vivid tui -m "Hello, what can you do?"
+```
+
+> **Without `npm link`:** use `npm run service` and `npm run tui` instead of `vivid service` / `vivid tui`.
+
+Default service URL is `http://127.0.0.1:3100`, configurable via `--url` or `VIVID_SERVICE_URL`.
+
+## 🧩 CLI Reference
+
+| Command | Description |
+|---|---|
+| `vivid service` | Start HTTP service for incoming prompts (`POST /prompt`) |
+| `vivid tui` | Open interactive CLI prompt window |
+| `vivid tui -m "prompt"` | Send one prompt and exit |
+| `vivid service --mock` | Start with mock AI engine (no API key needed) |
+| `vivid service --engine nvidia\|llama\|mock` | Choose AI provider |
 
 ## 🦙 Local AI via llama.cpp
-1. Start `llama.cpp` server with OpenAI-compatible endpoint:
+
+1. Start `llama.cpp` with an OpenAI-compatible endpoint:
+
 ```bash
 ./llama-server -m /path/to/model.gguf --host 0.0.0.0 --port 8080
 ```
-2. Configure Vivid:
-```bash
-export NVIDIA_API_KEY=nvapi-key
-export AI_ENGINE=llama
-export LLAMA_BASE_URL=http://127.0.0.1:8080
-export LLAMA_MODEL=local
-export LLAMA_MAX_TOKENS=4096
-```
-> 💡 **Tip:** We recommend copying `.env.example` to `.env` and configuring these values there instead of exporting them manually.
 
-3. Run service and send prompt:
+2. Copy `.env.example` to `.env` and configure:
+
 ```bash
-npm run service
-npm run tui -- -m "Hi there, what can you do?"
+AI_ENGINE=llama
+LLAMA_BASE_URL=http://127.0.0.1:8080
+LLAMA_MODEL=local
+LLAMA_MAX_TOKENS=4096
+NVIDIA_API_KEY=nvapi-key   # not required for llama engine
 ```
 
-## 🐳 Run in Docker
-```bash
-# build and run service
-docker compose up -d --build
+3. Run:
 
-# send prompt to the containerized service
+```bash
+vivid service
 vivid tui -m "Hi there, what can you do?"
 ```
 
-The Docker setup persists agent data in the local `./data/` folder (`VIVID_HOME=/data` in container).
+## 🐳 Docker
 
-## ⚙️ Run as Service with PM2
 ```bash
-npm run build
+docker compose up -d --build
+vivid tui -m "Hi there, what can you do?"
+```
+
+Agent data is persisted in `./data/` (`VIVID_HOME=/data` inside the container).
+
+## ⚙️ Run as a Background Service (PM2)
+
+```bash
+vivid service &       # simple background start
+```
+
+Or with [PM2](https://pm2.io/docs/runtime/guide/installation/) for process management:
+
+```bash
 npm run pm2:start
-
-# check status
 pm2 status
-
-# stop service
 npm run pm2:stop
 ```
 
-Alternatively, if you prefer to use `pm2` directly, you can use the provided `ecosystem.config.cjs` as a starting point:
-```bash
-pm2 start ecosystem.config.cjs
-pm2 stop vivid-agent
-pm2 logs vivid-agent
-```
+Storage path is configurable via `VIVID_HOME` (default: `./.vivid` in the working directory).
 
-For other PM2 commands, refer to [PM2 documentation](https://pm2.keymetrics.io/docs/usage/quick-start/)
+## 🤝 Join the Community
 
-You can customize storage path with `VIVID_HOME` (default: `./.vivid` in current working directory).
+Development happens in the open, and we'd love your help!
+- **[Discord](https://discord.gg/HtqrZuNhs6)** – real‑time discussions, support, and ideas.
+- **[GitHub Issues](https://github.com/vividorg/agent/issues)** – report bugs or suggest features.
+- **[Contributing guide](CONTRIBUTING.md)** – look for [good first issues](https://github.com/vividorg/agent/labels/good%20first%20issue) to get started.

@@ -18,7 +18,6 @@ export class Workspace {
         ]
 
         this.files = [
-            this.wp("TEST.md"),
             this.wp("memory", "MEMORY.md")
         ]
     }
@@ -36,11 +35,11 @@ export class Workspace {
 
     private async rwxToConstants(flag: number): Promise<number> {
         let _constants = fs.constants.F_OK;
-    
+
         if (flag & 4) _constants |= fs.constants.R_OK;
         if (flag & 2) _constants |= fs.constants.W_OK;
         if (flag & 1) _constants |= fs.constants.X_OK;
-    
+
         return _constants;
     }
 

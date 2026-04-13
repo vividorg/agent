@@ -35,11 +35,25 @@ export class Agent {
             try {
                 switch (action.type) {
                     case "memory":
-                        if (typeof action.content !== 'string') {
-                            throw new Error('Memory action content must be a string');
+                        if (typeof action.content !== 'object' || !('operation' in action.content) || !('content' in action.content)) {
+                            throw new Error('Memory action content must be an object with operation (append/replace) and content');
                         }
-                        await this.longTerm.append(action.content);
-                        this.shortTerm.context.memory = action.content;
+                        const memOp = action.content.operation;
+                        const memStr = action.content.content;
+                        if (typeof memStr !== 'string') {
+                            throw new Error('Memory action content field must be a string');
+                        }
+
+                        if (memOp === 'replace') {
+                            await this.longTerm.write(memStr);
+                        } else if (memOp === 'append') {
+                            await this.longTerm.append("\n" + memStr);
+                        } else {
+                            throw new Error('Memory operation must be strictly "append" or "replace"');
+                        }
+
+                        longMemory = await this.longTerm.read();
+                        this.shortTerm.context.memory = memStr;
                         attempts = 0; // Reset attempts after success
                         action = await this.ai.decide(this.shortTerm.snapshot(), longMemory, "", "Respond with type 'text' summarizing what you just did. Never return empty content.");
                         break;

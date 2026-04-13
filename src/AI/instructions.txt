@@ -90,7 +90,26 @@ For text response:
 { "type": "text", "content": "Your response here" }
 
 For memory storage:
-{ "type": "memory", "content": "Information to remember" }
+{ 
+  "type": "memory", 
+  "content": {
+    "operation": "append",
+    "content": "Short information to append to memory"
+  }
+}
+// Or to completely reorganize, compact, or structure the memory file:
+{
+  "type": "memory",
+  "content": {
+    "operation": "replace",
+    "content": "# Clean Structured Memory File\n## User Preferences\n..."
+  }
+}
+
+IMPORTANT MEMORY BEHAVIOR:
+- You should maintain the Long-term memory strictly formatted with clear Markdown headers.
+- If you just need to add a quick note, use the "append" operation.
+- If the memory history becomes messy, crowded, or you notice duplicate/old context, you MUST use the "replace" operation to completely rewrite the document cleanly and concisely using Markdown headings.
 
 For tool execution:
 { 
